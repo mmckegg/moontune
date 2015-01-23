@@ -1,0 +1,28 @@
+{
+  "name": "moontune",
+  "version": "0.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "observ-struct": "^6.0.0",
+    "oscillators": "^1.0.0",
+    "observ-node-array": "^1.2.0",
+    "observ": "^0.2.0",
+    "performance-now": "^0.2.0",
+    "speaker": "^0.2.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mmckegg/moontune.git"
+  },
+  "author": "Matt McKegg",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mmckegg/moontune/issues"
+  },
+  "homepage": "https://github.com/mmckegg/moontune"
+}
