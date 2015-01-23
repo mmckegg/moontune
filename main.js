@@ -1,4 +1,4 @@
-var fs = require('fs')
+var chokidar = require('chokidar');
 var fork = require('child_process').fork
 
 var context = {
@@ -29,7 +29,7 @@ function restart(){
   })
 }
 
-var watcher = fs.watch('./inner.js')
+var watcher = chokidar.watch('./inner.js')
 watcher.on('change', restart)
 
 restart()

@@ -221,9 +221,6 @@ function kick(amp, from, to, duration){
       ]
     } 
     
-
-    console.log(node)
-
     return node
   }
 }
