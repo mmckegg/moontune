@@ -5,13 +5,19 @@ function TriggerPattern(context){
   var obs = Observ([])
 
   obs.readState = function(schedule){
-    var result = new Float32Array(schedule.length)
-    var events = getResolvedEvents(obs(), schedule)
-    for (var t=0;t<schedule.length;t++){
-      var time = (t / schedule.length) * schedule.duration
-      result[t] = getInEvent(events, schedule.from + time)
+    if (obs() === true){
+      return true
+    } else {
+      var events = getResolvedEvents(obs(), schedule)
+      if (events.length){
+        var result = new Float32Array(schedule.length)
+        for (var t=0;t<schedule.length;t++){
+          var time = (t / schedule.length) * schedule.duration
+          result[t] = getInEvent(events, schedule.from + time)
+        }
+        return result
+      }
     }
-    return result
   }
 
   return obs
@@ -21,10 +27,10 @@ function getInEvent(events, time){
   for (var i=0;i<events.length;i++){
     var event = events[i]
     if (time >= event[0] && time < event[1]){
-      return time - event[0]
+      return 1
     }  
   }
-  return -1
+  return 0
 }
 
 function getResolvedEvents(events, schedule){

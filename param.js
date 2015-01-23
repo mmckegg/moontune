@@ -10,30 +10,31 @@ function ParamNode(context, defaultValue){
   var value = defaultValue
 
   obs(function(data){
-    if (data instanceof Object){
-      var newNode = getNode(data)
-      var lastNode = getNode(defaultValue)
 
-      if (newNode !== lastNode){
+    var newNode = getNode(data)
+    var lastNode = getNode(defaultValue)
 
-        var ctor = resolveNode(context.nodes, newNode)
+    if (newNode !== lastNode){
 
-        if (obs.node){
-          obs.node.destroy&&obs.node.destroy()
-          obs.node = null
-        }
-
-        if (ctor){
-          obs.node = ctor(context)
-        }
-
-      }
+      var ctor = resolveNode(context.nodes, newNode)
 
       if (obs.node){
-        obs.node.set(data) 
+        obs.node.destroy&&obs.node.destroy()
+        obs.node = null
       }
+
+      if (ctor){
+        obs.node = ctor(context)
+      }
+
+    }
+
+    if (obs.node){
+      obs.node.set(data) 
+    } else if (typeof data === 'number' || typeof data === 'string') {
+      value = data
     } else {
-      value = data != null ? data : defaultValue
+      value = defaultValue
     }
 
     lastDescriptor = data

@@ -1,16 +1,18 @@
 var NodeArray = require('observ-node-array')
+var readEventValue = require('./event-value')
 
 module.exports = AudioNodeArray
 
 function AudioNodeArray(context){
   var obs = NodeArray(context)
-  obs.readSamples = function(schedule){
-    return mix(schedule.length, obs.map(readSamples, schedule))
+  obs.readSamples = function(schedule, gain){
+    return mix(schedule.length, obs.map(readSamples, schedule), gain)
   }
   return obs
 }
 
-function mix(length, buffers){
+function mix(length, buffers, gain){
+  gain = gain != null ? gain : 1
   if (buffers && buffers.length){
     if (buffers.length === 1){
       return buffers[0]
@@ -23,7 +25,7 @@ function mix(length, buffers){
             val += buffers[x][i]
           }
         }
-        mix[i] = val
+        mix[i] = val * readEventValue(gain, i)
       }
       return mix
     }

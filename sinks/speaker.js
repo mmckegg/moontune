@@ -16,7 +16,8 @@ function SpeakerNode(context){
     channels: 1,
     bitDepth: 32,
     float: true,
-    sampleRate: context.sampleRate || 44100
+    sampleRate: context.sampleRate || 44100,
+    samplesPerFrame: 256
   })
 
   var lastSchedule = 0
@@ -25,7 +26,15 @@ function SpeakerNode(context){
   var stream = new Readable()
   stream._read = function(r){
     r = speaker.samplesPerFrame
+    stream.push(queue.shift() || silence(r))
+
+    process.nextTick(next)
+  }
+
+  function next(){
+    var r = speaker.samplesPerFrame
     var duration = r / speaker.sampleRate
+
     var schedule = {
       length: r,
       duration: duration,
@@ -36,9 +45,13 @@ function SpeakerNode(context){
       to: lastSchedule + duration,
       beatDuration: 1
     }
-    var buffer = normalize(obs.sources.readSamples(schedule)) || silence(r)
-    stream.push(buffer)
+
     lastSchedule += duration
+    queue.push(normalize(obs.sources.readSamples(schedule)))
+  }
+
+  for (var i=0;i<2;i++){
+    next()
   }
 
   stream.pipe(speaker)
