@@ -1,7 +1,7 @@
 var ObservStruct = require('observ-struct')
 var Observ = require('observ')
-var AudioNodeArray = require('../audio-node-array')
-var Param = require('../param')
+var AudioNodeArray = require('../lib/audio-node-array')
+var Param = require('../lib/param')
 
 module.exports = FilterNode
 

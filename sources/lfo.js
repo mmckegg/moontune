@@ -1,19 +1,20 @@
 var ObservStruct = require('observ-struct')
 var Observ = require('observ')
-var TriggerPattern = require('../trigger-pattern')
-var Param = require('../param')
-var readEventValue = require('../event-value')
+var TriggerPattern = require('../lib/trigger-pattern')
+var Param = require('../lib/param')
+var readEventValue = require('../lib/event-value')
 
-module.exports = function LfoNode(context){
+module.exports = function LfoNode(parentContext){
 
   var currentPhase = null
   var playing = false
 
+  var context = Object.create(parentContext)
+
   var obs = ObservStruct({
-    frequency: Param(context, 1),
-    mode: Observ(),
+    frequency: Param(context, 440),
+    play: TriggerPattern(context),
     value: Param(context, 1),
-    play: TriggerPattern(),
     amp: Param(context, 1),
     offset: Observ(),
     shape: Observ()
@@ -22,16 +23,16 @@ module.exports = function LfoNode(context){
   obs._type = 'LfoNode'
 
   obs.readSamples = function(schedule){
+    context.currentPattern = obs.play()
+
     var buffer = new Float32Array(schedule.length)
-    var duration = schedule.duration
-    var time = schedule.time
     var frequency = obs.frequency.readSamples(schedule)
     var amp = obs.amp.readSamples(schedule)
+    var value = obs.value.readSamples(schedule)
 
     var generate = oscillators[obs.shape()] || oscillators.sine
 
     var events = obs.play.readState(schedule)
-    var values = obs.value.readSamples(schedule)
 
     if (events){
       for (var i=0;i<schedule.length;i++){
@@ -45,15 +46,17 @@ module.exports = function LfoNode(context){
 
           var f = readEventValue(frequency, i)
           var a = readEventValue(amp, i)
+          var v = readEventValue(value, i)
 
           var sampleIncrement = f / context.sampleRate
           currentPhase = currentPhase != null ? (currentPhase + sampleIncrement) % 1 : 0
-          buffer[i] = generate(currentPhase) * a + readEventValue(values, i)
+          buffer[i] = generate(currentPhase) * a + v
 
         } else {
           playing = false
           buffer[i] = 0
         }
+
       }
     }
 
@@ -62,6 +65,7 @@ module.exports = function LfoNode(context){
 
   return obs
 }
+
 
 var oscillators = {
   sine: function(p){

@@ -1,9 +1,13 @@
 var ObservStruct = require('observ-struct')
 var Observ = require('observ')
-var Param = require('../param')
-var readEventValue = require('../event-value')
+var Param = require('../lib/param')
+var readEventValue = require('../lib/event-value')
+var getResolvedEvents = require('../lib/get-resolved-events')
 
-module.exports = function EnvelopeNode(context){
+module.exports = function EnvelopeNode(parentContext){
+
+  var context = Object.create(parentContext)
+
   var obs = ObservStruct({
     startValue: Observ(),
     attack: Observ(),
@@ -23,13 +27,16 @@ module.exports = function EnvelopeNode(context){
   obs.readSamples = function(schedule){
 
     var values = obs.value.readSamples(schedule)
+    var pattern = obs.play()||context.currentPattern
 
-    if (obs.play() === true){
-      return values
+    context.currentPattern = pattern
+
+    if (pattern === true){
+      return pattern
     }
 
     var events = getResolvedEvents(
-      obs.play()||[],
+      pattern||[],
       schedule
     )
 
@@ -44,7 +51,7 @@ module.exports = function EnvelopeNode(context){
     if (events.length){
       var result = new Float32Array(schedule.length)
       for (var t=0;t<schedule.length;t++){
-        var time = (t / schedule.length) * schedule.duration
+        var time = (t / schedule.length) * schedule.duration * schedule.beatDuration
         var at = schedule.from + time
         var event = getEvent(events, at)
         var value = readEventValue(values, t)
@@ -76,13 +83,13 @@ module.exports = function EnvelopeNode(context){
             pos = 0
             if (phase === 'attack'){
               from = startValue
-              step = 1 / attack / context.sampleRate
+              step = schedule.beatDuration / attack / context.sampleRate
             } else if (phase === 'decay'){
               from = currentValue
-              step = 1 / decay / context.sampleRate
+              step = schedule.beatDuration / decay / context.sampleRate
             } else if (phase === 'release'){
               from = currentPhase ? currentValue : value
-              step = 1 / release / context.sampleRate
+              step = schedule.beatDuration / release / context.sampleRate
             } else {
               from = step = target = null
             }
@@ -131,34 +138,4 @@ function getEvent(events, time){
 function linear(from, to, pos){
   var range = to - from
   return pos * range + from
-}
-
-function getResolvedEvents(events, schedule){
-  var result = []
-  if (Array.isArray(events)){
-    var loopLength = events[0] || 1
-    for (var i=1;i<events.length;i++){
-      var event = events[i]
-      var startPosition = getAbsolutePosition(event[0], schedule.from, loopLength)
-      var deltaPosition = (startPosition - schedule.from) / schedule.beatDuration
-      var startTime = schedule.time + deltaPosition
-      result.push([
-        startTime,
-        startTime + event[1]
-      ])
-    }
-  }
-  return result
-}
-
-
-function getAbsolutePosition(pos, start, length){
-  pos = pos % length
-  var micro = start % length
-  var position = start+pos-micro
-  if (position > start){
-    return position - length
-  } else {
-    return position
-  }
 }

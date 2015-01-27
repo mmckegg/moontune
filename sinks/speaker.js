@@ -1,5 +1,6 @@
-var AudioNodeArray = require('../audio-node-array')
+var AudioNodeArray = require('../lib/audio-node-array')
 var ObservStruct = require('observ-struct')
+var Observ = require('observ')
 
 var Speaker = require('speaker');
 var Readable = require('stream').Readable
@@ -9,7 +10,8 @@ module.exports = SpeakerNode
 
 function SpeakerNode(context){
   var obs = ObservStruct({
-    sources: AudioNodeArray(context)
+    sources: AudioNodeArray(context),
+    tempo: Observ()
   })
 
   var speaker = new Speaker({
@@ -21,6 +23,7 @@ function SpeakerNode(context){
   })
 
   var lastSchedule = 0
+  var position = 0
 
   var queue = []
   var stream = new Readable()
@@ -32,8 +35,10 @@ function SpeakerNode(context){
   }
 
   function next(){
+    var tempo = obs.tempo() || 120
     var r = speaker.samplesPerFrame
     var duration = r / speaker.sampleRate
+    var beatDuration =  tempo / 60
 
     var schedule = {
       length: r,
@@ -41,11 +46,14 @@ function SpeakerNode(context){
       time: lastSchedule,
 
       // fake beat clock (60bpm for now)
-      from: lastSchedule,
-      to: lastSchedule + duration,
-      beatDuration: 1
+      from: position,
+      to: position + duration * beatDuration,
+      beatDuration: beatDuration
     }
 
+    //console.log(position)
+
+    position += duration * beatDuration
     lastSchedule += duration
     queue.push(normalize(obs.sources.readSamples(schedule)))
   }

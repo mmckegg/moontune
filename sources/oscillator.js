@@ -1,18 +1,20 @@
 var ObservStruct = require('observ-struct')
 var Observ = require('observ')
-var TriggerPattern = require('../trigger-pattern')
-var Param = require('../param')
-var readEventValue = require('../event-value')
+var TriggerPattern = require('../lib/trigger-pattern')
+var Param = require('../lib/param')
+var readEventValue = require('../lib/event-value')
 
-module.exports = function OscillatorNode(context){
+module.exports = function OscillatorNode(parentContext){
 
   var currentPhase = null
   var playing = false
 
+  var context = Object.create(parentContext)
+
   var obs = ObservStruct({
     frequency: Param(context, 440),
     detune: Param(context, 0),
-    play: TriggerPattern(),
+    play: TriggerPattern(context),
     amp: Param(context, 1),
     offset: Observ(),
     shape: Observ()
@@ -21,6 +23,8 @@ module.exports = function OscillatorNode(context){
   obs._type = 'OscillatorNode'
 
   obs.readSamples = function(schedule){
+    context.currentPattern = obs.play()
+
     var buffer = new Float32Array(schedule.length)
     var duration = schedule.duration
     var time = schedule.time

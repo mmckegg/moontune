@@ -8,13 +8,14 @@
     "observ": "^0.2.0",
     "observ-node-array": "^1.2.0",
     "observ-struct": "^6.0.0",
-    "oscillators": "^1.0.0",
     "performance-now": "^0.2.0",
-    "speaker": "^0.2.2"
+    "speaker": "^0.2.2",
+    "supervisor": "^0.6.0"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "supervisor -w main.js main.js"
   },
   "repository": {
     "type": "git",
