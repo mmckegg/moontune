@@ -2,10 +2,11 @@
 var Speaker = require('speaker')
 
 
-
 /*
+
 var fs = require('fs')
-var audioFile = '/Users/matt/Projects/Destroy With Science/Exports/Time Travellers Die.wav'
+var audioFile = 
+  '../../Projects/Destroy With Science/Exports/Time Travellers Die.wav'
 
 var speaker = Speaker({
   channels: 2,
@@ -15,8 +16,8 @@ var speaker = Speaker({
 
 fs.createReadStream(audioFile, {start: 44})
   .pipe(speaker)
-*/
 
+*/
 
 /*
 var Readable = require('stream').Readable
@@ -60,7 +61,7 @@ function toBuffer(buffer){
 
 
 
-/*
+
 
 var context = {
   nodes: {
@@ -79,35 +80,35 @@ var context = {
 
 var speaker = context.nodes.speaker(context)
 
-speaker.set({
-  sources: [
+// speaker.set({
+//   sources: [
 
-    { node: 'oscillator',
-      frequency: 220,
-      shape: 'saw',
-      play: [2, [0, 1]],
-      amp: {
-        node: 'envelope',
-        release: 0.1
-      }
-    },
+//     { node: 'oscillator',
+//       frequency: 220,
+//       shape: 'saw',
+//       play: [2, [0, 1]],
+//       amp: {
+//         node: 'envelope',
+//         release: 0.1
+//       }
+//     },
 
-    { node: 'oscillator',
-      frequency: 440,
-      shape: 'square',
-      play: [4, [0, 1/2], [1, 1/2], [2,1/4], [2+1/2,1/4], [3,1/8], [3+1/4,1/8]],
-      amp: {
-        node: 'envelope',
-        value: 0.4,
-        release: 0.2
-      }
-    }
-  ]
-})
+//     { node: 'oscillator',
+//       frequency: 440,
+//       shape: 'square',
+//       play: [4, [0, 1/2], [1, 1/2], [2,1/4], [2+1/2,1/4], [3,1/8], [3+1/4,1/8]],
+//       amp: {
+//         node: 'envelope',
+//         value: 0.4,
+//         release: 0.2
+//       }
+//     }
+//   ]
+// })
 
-*/
 
-/*
+
+
 var chokidar = require('chokidar');
 var fork = require('child_process').fork
 var child = null
@@ -122,7 +123,7 @@ function restart(){
 var watcher = chokidar.watch('./inner.js')
 watcher.on('change', restart)
 restart()
-*/
+
 
 
 setInterval(function(){}, 1000) // keep alive :)
